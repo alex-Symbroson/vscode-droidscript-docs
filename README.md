@@ -62,16 +62,22 @@ You can also upload all docs from `All Commands` in the status bar menu.\
 
 If you are satisfied with the result of your changes to the Docs, you can commit and push your changes to your copy of the repo and then send a **Pull Request** to DroidScript Docs.
 
-## Live Preview Flickering Issue
+## Known Issues
+
+### File System Operation not Permitted
+
+There is a strange bug that occurs randomly when generating the docs, telling that it can't remove some files. It seems VSCode or the Live Preview extension keeps them open somewhere, preventing their deletion. If that occurs, just reload the VSCode window with `Ctrl+Shift+P > Reload Window`
+
+### Live Preview Flickering
 
 If you notice flickering on the live preview when you type on the editor or when you save a file, it is due to live preview extension settings that will auto update when there are changes in the editor files. You can turn it off in VS Code by going to
 
 **`"Settings > User > Extensions > Live Preview > Live Preview: Auto Refresh Preview"`**
 
-And then select **`"Never"`**.
+And then select **`"On Changes to Saved Files"`** or **`"Never"`**.
 
-### Authors
+## Authors
 - **GineersLife:** Jumar Hamac - *hamacjumar@gmail.com*
 
-#### Contributors:
+### Contributors:
 - **Symbroson:** - alex-Symbroson@gmail.com
