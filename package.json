@@ -75,10 +75,6 @@
         "title": "DroidScript Docs: Update Docs Version"
       },
       {
-        "command": "droidscript-docs.uploadFile",
-        "title": "DroidScript Docs: Upload File to DroidScript"
-      },
-      {
         "command": "droidscript-docs.upload",
         "title": "DroidScript Docs: Upload to DroidScript"
       },
@@ -98,6 +94,10 @@
       {
         "command": "droidscript-docs.selectCommand",
         "title": "DroidScript Docs: Select Command"
+      },
+      {
+        "command": "droidscript-docs.uploadFile",
+        "title": "DroidScript Docs: Upload File to DroidScript"
       },
       {
         "command": "droidscript-docs.generateFile",

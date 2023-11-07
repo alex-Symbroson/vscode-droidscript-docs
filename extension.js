@@ -11,7 +11,7 @@ const CONSTANTS = require('./src/CONSTANTS');
 const cmdPrefix = "droidscript-docs.";
 const titlePrefix = "DroidScript Docs: ";
 // default displayed commands
-const commands = ["generateDocs", "preview", "updatePages", "filter", "allCommands"];
+const commands = ["generateDocs", "preview", "updatePages", "upload", "filter", "allCommands"];
 
 /** @type {CmdMap} */
 const cmdMap = Object.assign({}, ...pkg.contributes.commands.map(c =>
