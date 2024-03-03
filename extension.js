@@ -104,7 +104,7 @@ function deactivate() {
 
 async function readConf() {
     await util.loadJson(confPath)
-        .then(cfg => { conf = cfg;  Object.assign(tnames, conf.tname, conf.tdesc); })
+        .then(cfg => { conf = cfg; Object.assign(tnames, conf.tname, conf.tdesc); })
         .catch(e => { vscode.window.showErrorMessage(e); });
 }
 
@@ -190,7 +190,7 @@ function processHandler(cp) {
     let error;
     return new Promise((res, rej) => {
         cp.on("error", e => (error = e, chn.append("$ Error: " + e)));
-        cp.on("exit", (code, sig) => (chn.append(`$ Exit Code: ${code}` + (sig ? ` (${sig})` : '')), 
+        cp.on("exit", (code, sig) => (chn.append(`$ Exit Code: ${code}` + (sig ? ` (${sig})` : '')),
             (error || code ? rej : res)([code || 0, error || "Process returned non-null exit code.\nCheck the debug log for details."])));
     });
 }
@@ -235,14 +235,12 @@ async function addVariant() {
 }
 
 /** @param {vscode.Uri} uri */
-async function uploadFile(uri)
-{
+async function uploadFile(uri) {
     const fileFilter = util.getFileFilter(uri);
     if (fileFilter) uploadDocs(fileFilter);
 }
 
-async function enterServerIP()
-{
+async function enterServerIP() {
     let serverIP = dsconf.serverIP;
     dsconf.PORT ||= CONSTANTS.PORT;
     if (serverIP && !dsconf.serverIP.includes(':'))
@@ -251,15 +249,15 @@ async function enterServerIP()
 
     vscode.window.showInformationMessage("Enter DS Server IP");
     let newIP = await vscode.window.showInputBox({
-            title: "Enter DS Server IP", 
-            value: serverIP || '',
-            placeHolder: '192.168.178.42:' + CONSTANTS.PORT,
-            validateInput: ip => {
-                if (util.isValidIPWithPort(ip)) return;
-                return util.isValidIP(ip) ? (validPort ? null : "Invalid IP") : "Missing Port";
-            }
-        });
-    
+        title: "Enter DS Server IP",
+        value: serverIP || '',
+        placeHolder: '192.168.178.42:' + CONSTANTS.PORT,
+        validateInput: ip => {
+            if (util.isValidIPWithPort(ip)) return;
+            return util.isValidIP(ip) ? (validPort ? null : "Invalid IP") : "Missing Port";
+        }
+    });
+
     if (!newIP) { vscode.window.showErrorMessage("Server IP not updated!"); return; }
     if (!util.isValidIPWithPort(newIP)) newIP += ":" + dsconf.PORT;
     if (!util.isValidIPWithPort(newIP)) { vscode.window.showErrorMessage("Server IP not updated!"); return; }
@@ -272,7 +270,7 @@ async function enterServerIP()
 async function uploadDocs(sfilter = filter) {
     await readDSConf();
     if (!util.isValidIPWithPort(dsconf.serverIP)) { enterServerIP(); return; }
-    
+
     await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
         title: `Uploading docs`,
@@ -285,12 +283,12 @@ async function uploadDocs(sfilter = filter) {
         const cwd = path.join(folderPath, "out", "docs" + (filter.lang == 'en' ? '' : `-${filter.lang}`), filter.ver);
         // a+b: a/b,  a+*: a/*,  *+b: */b,  *+*: **
         const docsGlob = `${filter.scope}/${filter.name}`.replace('*/*', '**');
-        const files = await glob.glob(docsGlob, {cwd, posix: true, nodir: true});
+        const files = await glob.glob(docsGlob, { cwd, posix: true, nodir: true });
 
         // reverse() as glob is somewhat reverse sorted
         await util.batchPromises(files.reverse(), async (file, index, data) => {
             if (token.isCancellationRequested) throw new Error("Cancelled");
-            
+
             const dest = '.edit/docs/' + file;
             const folder = dest.slice(0, dest.lastIndexOf('/'));
             const name = path.basename(file);
@@ -299,13 +297,14 @@ async function uploadDocs(sfilter = filter) {
             const res = await util.uploadFile(dsconf.serverIP, fileStream, folder, name);
 
             if (res.status !== "ok") throw Error(JSON.stringify(res));
-            progress.report({increment: 100 / data.length, message: file});
+            progress.report({ increment: 100 / data.length, message: file });
         })
-        .then(() => { vscode.window.showInformationMessage("Upload Successful"); })
-        .catch(e => {
-            vscode.window.showErrorMessage("Upload Failed: " + e.message);
-            if (e.code == "ETIMEDOUT") enterServerIP();
-        });
+            .then(() => { vscode.window.showInformationMessage("Upload Successful"); })
+            .catch(e => {
+                if (e.code == "ETIMEDOUT") enterServerIP();
+                vscode.window.showErrorMessage("Upload Failed: " + e.message, "Retry")
+                    .then(res => { res == "Retry" && uploadDocs(sfilter) });
+            });
     });
     readConf();
 }
